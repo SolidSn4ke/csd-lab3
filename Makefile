@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := all
 
 BUILD_DIR := Debug
-PROJECT   := lab-1
+PROJECT   := csd-lab3
 ELF       := $(BUILD_DIR)/$(PROJECT).elf
 
 OPENOCD     := openocd
@@ -14,24 +14,24 @@ JOBS        ?= $(shell nproc)
 
 OPENOCD_SCRIPT = $(TARGET) configure -event reset-start {adapter speed $(JTAG_SPEED)}; $(TARGET) configure -event reset-init {adapter speed $(JTAG_SPEED)}; program $(ELF) verify reset exit
 
-.PHONY: all build flash flash-only clean rebuild
+.PHONY: all build flush flush-only clean rebuild
 
 all: build
 
 build:
-  $(MAKE) -C $(BUILD_DIR) -j$(JOBS) all
+	$(MAKE) -C $(BUILD_DIR) -j$(JOBS) all
 
-flash: build
-  $(MAKE) flash-only
+flush: build
+	$(MAKE) flush-only
 
-flash-only:
-  @test -f "$(ELF)" || { echo "Firmware $(ELF) not found. Run 'make' first." >&2; exit 1; }
-  $(OPENOCD) -s . -f '$(OPENOCD_CFG)' -c '$(OPENOCD_SCRIPT)'
+flush-only:
+	@test -f "$(ELF)" || { echo "Firmware $(ELF) not found. Run 'make' first." >&2; exit 1; }
+	$(OPENOCD) -s . -f '$(OPENOCD_CFG)' -c '$(OPENOCD_SCRIPT)'
 
 clean:
-  $(MAKE) -C $(BUILD_DIR) clean
+	$(MAKE) -C $(BUILD_DIR) clean
 
 rebuild:
-  $(MAKE) clean
-  $(MAKE) build
+	$(MAKE) clean
+	$(MAKE) build
 
